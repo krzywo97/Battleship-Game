@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.SignalR.Client;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,9 @@ namespace Client
     /// </summary>
     public partial class MainWindow : Window
     {
+        private HubConnection connection = new HubConnectionBuilder()
+            .WithUrl(@"http://localhost:8000/hubs/battleship")
+            .Build();
         public MainWindow()
         {
             InitializeComponent();
