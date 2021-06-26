@@ -30,12 +30,16 @@ namespace Client
         {
             InitializeComponent();
             InitializeUi();
-
-            GameSession = new Game(@"http://localhost:8000/hubs/battleship");
         }
 
         private void InitializeUi()
         {
+            SeatCombobox.Items.Add("Seat 1");
+            SeatCombobox.Items.Add("Seat 2");
+            SeatCombobox.SelectedIndex = 0;
+
+            JoinButton.Click += HandleJoin;
+
             for (int y = 0; y < 10; y++)
             {
                 for (int x = 0; x < 10; x++)
@@ -81,7 +85,15 @@ namespace Client
 
             return b;
         }
+        private void HandleJoin(object sender, RoutedEventArgs e)
+        {
+            NicknameTextbox.IsEnabled = false;
+            SeatCombobox.IsEnabled = false;
+            JoinButton.IsEnabled = false;
 
+            GameSession = new Game(@"http://localhost:8000/hubs/battleship", SeatCombobox.SelectedIndex, NicknameTextbox.Text);
+            GameSession.OnChatMessage += OnChatMessage;
+        }
 
         private void HandleShipArrangement(object sender, RoutedEventArgs e)
         {
@@ -98,6 +110,18 @@ namespace Client
         private void SurrenderButton_Click(object sender, RoutedEventArgs e)
         {
             
+        }
+
+        private void SendChatMessage(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter) return;
+
+            GameSession.SendChatMessage(MessageTextbox.Text);
+        }
+
+        private void OnChatMessage(string nickname, string message)
+        {
+            MessagesListbox.Items.Add(nickname + ": " + message);
         }
     }
 }
