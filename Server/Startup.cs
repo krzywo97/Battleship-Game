@@ -31,7 +31,7 @@ namespace Server
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<GameHub>("/hubs/battleship/");
+                endpoints.MapHub<GameHub>("/hubs/battleship");
             });
         }
     }

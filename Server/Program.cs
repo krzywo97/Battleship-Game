@@ -20,7 +20,8 @@ namespace Server
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseUrls("http://*:4000")
+                    webBuilder
+                    .UseUrls("http://*:4000")
                     .UseStartup<Startup>();
                 });
     }

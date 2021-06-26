@@ -5,14 +5,136 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="468" Width="903" ResizeMode="CanMinimize">
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Grid HorizontalAlignment="Left"/>
+        <Grid x:Name="MyBoard" HorizontalAlignment="Center" Width="300" Margin="0,10,0,10">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Label Content="A" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="B" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="C" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="D" Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="E" Grid.Column="5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="F" Grid.Column="6" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="G" Grid.Column="7" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="H" Grid.Column="8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="I" Grid.Column="9" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="J" Grid.Column="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="1" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center"/>
+            <Label Content="2" HorizontalAlignment="Center" Grid.Row="2" VerticalAlignment="Center"/>
+            <Label Content="3" HorizontalAlignment="Center" Grid.Row="3" VerticalAlignment="Center"/>
+            <Label Content="4" HorizontalAlignment="Center" Grid.Row="4" VerticalAlignment="Center"/>
+            <Label Content="5" HorizontalAlignment="Center" Grid.Row="5" VerticalAlignment="Center"/>
+            <Label Content="6" HorizontalAlignment="Center" Grid.Row="6" VerticalAlignment="Center"/>
+            <Label Content="7" HorizontalAlignment="Center" Grid.Row="7" VerticalAlignment="Center"/>
+            <Label Content="8" HorizontalAlignment="Center" Grid.Row="8" VerticalAlignment="Center"/>
+            <Label Content="9" HorizontalAlignment="Center" Grid.Row="9" VerticalAlignment="Center"/>
+            <Label Content="10" HorizontalAlignment="Center" Grid.Row="10" VerticalAlignment="Center"/>
+        </Grid>
+        <TextBox x:Name="NicknameTextbox" Grid.Column="2" HorizontalAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="206" Height="18" Text="Player"/>
+        <TextBox x:Name="MessageTextbox" Grid.Column="2" HorizontalAlignment="Center" Margin="8,0,8,35" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="206">
+            <TextBox.Style>
+                <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                    <Style.Resources>
+                        <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                            <VisualBrush.Visual>
+                                <Label Content="Type your message" Foreground="DarkGray" />
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </Style.Resources>
+                    <Style.Triggers>
+                        <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                            <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="Text" Value="{x:Null}">
+                            <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="Background" Value="White" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+        <ListBox x:Name="MessagesListbox" Grid.Column="2" Margin="8,33,8,58"/>
+        <Grid x:Name="EnemyBoard" HorizontalAlignment="Center" Width="300" Margin="0,10,0,10" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Label Content="A" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="B" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="C" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="D" Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="E" Grid.Column="5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="F" Grid.Column="6" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="G" Grid.Column="7" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="H" Grid.Column="8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="I" Grid.Column="9" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="J" Grid.Column="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label Content="1" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center"/>
+            <Label Content="2" HorizontalAlignment="Center" Grid.Row="2" VerticalAlignment="Center"/>
+            <Label Content="3" HorizontalAlignment="Center" Grid.Row="3" VerticalAlignment="Center"/>
+            <Label Content="4" HorizontalAlignment="Center" Grid.Row="4" VerticalAlignment="Center"/>
+            <Label Content="5" HorizontalAlignment="Center" Grid.Row="5" VerticalAlignment="Center"/>
+            <Label Content="6" HorizontalAlignment="Center" Grid.Row="6" VerticalAlignment="Center"/>
+            <Label Content="7" HorizontalAlignment="Center" Grid.Row="7" VerticalAlignment="Center"/>
+            <Label Content="8" HorizontalAlignment="Center" Grid.Row="8" VerticalAlignment="Center"/>
+            <Label Content="9" HorizontalAlignment="Center" Grid.Row="9" VerticalAlignment="Center"/>
+            <Label Content="10" HorizontalAlignment="Center" Grid.Row="10" VerticalAlignment="Center"/>
+        </Grid>
+        <Button x:Name="SurrenderButton" Content="Ready" Grid.Column="2" HorizontalAlignment="Center" Margin="0,0,0,10" VerticalAlignment="Bottom" Width="206" Click="SurrenderButton_Click"/>
 
     </Grid>
 </Window>
