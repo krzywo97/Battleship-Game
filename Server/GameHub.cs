@@ -9,12 +9,7 @@ namespace Server
 {
     public class GameHub : Hub
     {
-
-        GameHub() { }
-
-
-
-        public async void ChatMessage(string nickname, string message)
+        public async Task ChatMessage(string nickname, string message)
         {
             await Clients.All.SendAsync("ChatMessage", nickname, message);
         }

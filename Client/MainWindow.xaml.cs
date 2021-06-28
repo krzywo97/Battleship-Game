@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,10 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Client
 {
@@ -90,11 +86,15 @@ namespace Client
             NicknameTextbox.IsEnabled = false;
             SeatCombobox.IsEnabled = false;
             JoinButton.IsEnabled = false;
+            MessageTextbox.IsEnabled = true;
 
-            GameSession = new Game(@"http://localhost:8000/hubs/battleship", SeatCombobox.SelectedIndex, NicknameTextbox.Text);
+            GameSession = new Game(@"http://localhost:4000/hubs/battleship", SeatCombobox.SelectedIndex, NicknameTextbox.Text);
             GameSession.OnChatMessage += OnChatMessage;
         }
 
+        /*
+         * UI event handlers
+         */
         private void HandleShipArrangement(object sender, RoutedEventArgs e)
         {
             var button = (Button)sender;
@@ -112,6 +112,9 @@ namespace Client
             
         }
 
+        /*
+         * Game event handlers
+         */
         private void SendChatMessage(object sender, KeyEventArgs e)
         {
             if (e.Key != Key.Enter) return;
