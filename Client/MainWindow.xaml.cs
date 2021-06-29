@@ -31,8 +31,8 @@ namespace Client
 
         private void InitializeUi()
         {
-            SeatCombobox.Items.Add("Seat 1");
-            SeatCombobox.Items.Add("Seat 2");
+            SeatCombobox.Items.Add("Miejsce 1");
+            SeatCombobox.Items.Add("Miejsce 2");
             SeatCombobox.SelectedIndex = 0;
 
             JoinButton.Click += HandleJoin;
@@ -83,8 +83,13 @@ namespace Client
             return b;
         }
 
+        /*
+         * UI event handlers
+         */
         private void HandleJoin(object sender, RoutedEventArgs e)
         {
+            MessagesListbox.Items.Add("Łączenie z serwerem...");
+
             NicknameTextbox.IsEnabled = false;
             SeatCombobox.IsEnabled = false;
             JoinButton.IsEnabled = false;
@@ -103,9 +108,6 @@ namespace Client
             Connection.SendAsync("Join", NicknameTextbox.Text, Seat);
         }
 
-        /*
-         * UI event handlers
-         */
         private void HandleShipArrangement(object sender, RoutedEventArgs e)
         {
             var button = (Button)sender;
@@ -146,7 +148,7 @@ namespace Client
         {
             if (result)
             {
-                MessagesListbox.Items.Add("Zajęto miejsce: " + Seat);
+                MessagesListbox.Items.Add("Zajęto miejsce: " + (Seat + 1));
             }
             else
             {
@@ -167,6 +169,8 @@ namespace Client
             }
             else if (newState == "ArrangingShips")
             {
+                ActionButton.Content = "Gotowy";
+
                 foreach (Button b in MyButtons)
                 {
                     b.IsEnabled = true;
