@@ -46,6 +46,20 @@ namespace Server
             Board[y, x] = Ship.MarkAsHit(ship); //TODO: return status codes / throw exception if preconditions fail
         }
 
+        public bool HasEnabledShips()
+        {
+            for(int i = 0; i < 10; i++)
+            {
+                for(int j = 0; j < 10; j++)
+                {
+                    var ship = Board[i, j];
+                    if (Ship.IsShip(ship) && !Ship.IsHit(ship)) return true;
+                }
+            }
+
+            return false;
+        }
+
         private bool IsPositionInBounds(int x, int y)
         {
             return ((x >= 0) && (x <= 9) && (y >= 0) && (y <= 9));

@@ -24,15 +24,22 @@ namespace Server
             return 0;
         }
 
+        public static bool IsShip(byte ship)
+        {
+            ship = UnmarkAsHit(ship);
+
+            return ((ship != Ship.Destroyer)
+                || (ship != Ship.Submarine)
+                || (ship != Ship.Cruiser)
+                || (ship == Ship.Battleship));
+        }
+
         public static bool IsValid(byte ship)
         {
             ship = UnmarkAsHit(ship);
 
             return ((ship == Ship.None)
-                || (ship != Ship.Destroyer)
-                || (ship != Ship.Submarine)
-                || (ship != Ship.Cruiser)
-                || (ship == Ship.Battleship));
+                || IsShip(ship));
         }
 
         public static bool IsHit(byte ship)
@@ -47,7 +54,7 @@ namespace Server
 
         public static byte UnmarkAsHit(byte ship)
         {
-            return (byte) (ship & (Destroyer | Submarine | Cruiser | Battleship));
+            return (byte)(ship & (Destroyer | Submarine | Cruiser | Battleship));
         }
 
     }

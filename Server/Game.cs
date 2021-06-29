@@ -60,17 +60,15 @@ namespace Server
         /// </summary>
         /// <param name="player">Seat of a player that has just fired a shot</param>
         /// <returns>
-        /// -0 when precondition fails
+        /// -1 when precondition fails
         /// 0 when the game is still in progress
         /// 1 when the player has won
         /// </returns>
         private int CheckWin(int player)
         {
             if (player != 0 && player != 1) return -1;
-
-            //TODO: do some logic
-
-            return 0;
+            if (Players[1 - player].HasEnabledShips()) return 0;
+            return 1;
         }
     }
 }
