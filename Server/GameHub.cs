@@ -13,7 +13,10 @@ namespace Server
 
         public async Task Join(string nickname, int seat)
         {
-            if(CurrentGame.JoinPlayer(nickname, seat))
+            var result = CurrentGame.JoinPlayer(nickname, seat);
+            await Clients.Caller.SendAsync("JoinResult", result);
+
+            if(CurrentGame.AreBothPlayersConnected())
             {
                 CurrentGame.State = GameState.ArrangingShips;
                 await Clients.All.SendAsync("GameState", "ArrangingShips");
@@ -64,9 +67,14 @@ namespace Server
             }
         }
 
-        public async Task ChatMessage(string nickname, string message)
+        public async Task ChatMessage(int seat, string message)
         {
-            await Clients.All.SendAsync("ChatMessage", nickname, message);
+            if (seat != 0 && seat != 1) return;
+
+            var player = CurrentGame.Players[seat];
+            if (player == null) return;
+           
+            await Clients.All.SendAsync("ChatMessage", player.Name, message);
         }
     }
 }

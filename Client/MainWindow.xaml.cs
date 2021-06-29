@@ -17,10 +17,11 @@ namespace Client
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Game GameSession;
-
         private Button[,] MyButtons = new Button[10, 10];
         private Button[,] EnemyButtons = new Button[10, 10];
+
+        private HubConnection Connection;
+        private int Seat;
 
         public MainWindow()
         {
@@ -76,20 +77,30 @@ namespace Client
         {
             Button b = new Button();
             b.Name = (myBoard ? "M_" : "E_") + y + "_" + x;
+            b.Tag = new int[2] { x, y };
             b.Click += myBoard ? HandleShipArrangement : HandleShot;
             b.IsEnabled = false;
 
             return b;
         }
+
         private void HandleJoin(object sender, RoutedEventArgs e)
         {
             NicknameTextbox.IsEnabled = false;
             SeatCombobox.IsEnabled = false;
             JoinButton.IsEnabled = false;
             MessageTextbox.IsEnabled = true;
+            Seat = SeatCombobox.SelectedIndex;
 
-            GameSession = new Game(@"http://localhost:4000/hubs/battleship", SeatCombobox.SelectedIndex, NicknameTextbox.Text);
-            GameSession.OnChatMessage += OnChatMessage;
+            Connection = new HubConnectionBuilder()
+                .WithUrl(@"http://localhost:4000/hubs/battleship")
+                .Build();
+    
+            Connection.On<bool>("JoinResult", OnJoinResult);
+            Connection.On<string, string>("ChatMessage", OnChatMessage);
+
+            Connection.StartAsync();
+            Connection.SendAsync("Join", NicknameTextbox.Text, Seat);
         }
 
         /*
@@ -98,28 +109,54 @@ namespace Client
         private void HandleShipArrangement(object sender, RoutedEventArgs e)
         {
             var button = (Button)sender;
+            int[] tag = (int[])button.Tag;
+            int x = tag[0];
+            int y = tag[1];
 
         }
 
         private void HandleShot(object sender, RoutedEventArgs e)
         {
             var button = (Button)sender;
+            int[] tag = (int[])button.Tag;
+            int x = tag[0];
+            int y = tag[1];
 
         }
 
         private void SurrenderButton_Click(object sender, RoutedEventArgs e)
         {
-            
+
+        }
+
+        private void SendChatMessage(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter) return;
+            if (MessageTextbox.Text.Length == 0) return;
+
+            Connection.SendAsync("ChatMessage", Seat, MessageTextbox.Text);
+            MessageTextbox.Text = "";
         }
 
         /*
          * Game event handlers
          */
-        private void SendChatMessage(object sender, KeyEventArgs e)
-        {
-            if (e.Key != Key.Enter) return;
 
-            GameSession.SendChatMessage(MessageTextbox.Text);
+        private void OnJoinResult(bool result)
+        {
+            if (result)
+            {
+                MessagesListbox.Items.Add("Zajęto miejsce: " + Seat);
+            }
+            else
+            {
+                NicknameTextbox.IsEnabled = true;
+                SeatCombobox.IsEnabled = true;
+                JoinButton.IsEnabled = true;
+                MessageTextbox.IsEnabled = false;
+                MessagesListbox.Items.Add("Nie udało się zająć miejsca");
+                Connection.DisposeAsync();
+            }
         }
 
         private void OnChatMessage(string nickname, string message)

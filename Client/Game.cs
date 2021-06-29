@@ -161,11 +161,6 @@ namespace Client
             Connection.SendAsync("ShotFired", PlayerId, x, y);
         }
 
-        public void SendChatMessage(string message)
-        {
-            Connection.SendAsync("ChatMessage", Nickname, message);
-        }
-
         /*
          * Other stuff
          */

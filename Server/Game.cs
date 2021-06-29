@@ -35,8 +35,8 @@ namespace Server
         /// <param name="name">A nickname of the player</param>
         /// <param name="seat">A seat the player will sit on</param>
         /// <returns>
-        /// false when first player joined
-        /// true when both players are connected and the game can be started
+        /// false when unable to seat a player
+        /// true otherwise
         /// </returns>
         public bool JoinPlayer(string name, int seat)
         {
@@ -47,7 +47,7 @@ namespace Server
             var player = new Player(name);
             Players[seat] = player;
 
-            return (Players[0] != null && Players[1] != null);
+            return true;
         }
 
         /// <summary>
@@ -123,6 +123,11 @@ namespace Server
             var result = Players[1 - player].HandleIncomingFire(x, y);
             Turn = 1 - Turn;
             return result;
+        }
+
+        public bool AreBothPlayersConnected()
+        {
+            return Players[0] != null && Players[1] != null;
         }
 
         public bool AreBothPlayersReady()
