@@ -31,12 +31,6 @@ namespace Client
 
         private void InitializeUi()
         {
-            SeatCombobox.Items.Add("Miejsce 1");
-            SeatCombobox.Items.Add("Miejsce 2");
-            SeatCombobox.SelectedIndex = 0;
-
-            JoinButton.Click += HandleJoin;
-
             for (int y = 0; y < 10; y++)
             {
                 for (int x = 0; x < 10; x++)
