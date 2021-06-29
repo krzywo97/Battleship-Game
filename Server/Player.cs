@@ -23,27 +23,51 @@ namespace Server
             Board = new byte[10, 10];
         }
 
-        public void ReadyUp()
+        /// <summary>
+        /// Marks the player as ready to start the game
+        /// </summary>
+        /// <returns>
+        /// false if player hasn't set all of their ships
+        /// true otherwise
+        /// </returns>
+        public bool ReadyUp()
         {
+            // TODO: Validate player's board
             Ready = true;
+            return true;
         }
 
-        public void SetShip(byte ship, int x, int y)
+        public bool SetShip(byte ship, int x, int y, bool vertical)
         {
-            if (!IsPositionInBounds(x, y)) return;
-            if (!Ship.IsValid(ship)) return;
+            if (!IsPositionInBounds(x, y)) return false;
+            if (!Ship.IsValid(ship)) return false;
 
+            var size = Ship.GetSize(ship);
+            // if(!ValidatePlacement(byte ship, int x, int y, bool vertical)) return false;
+
+            // TODO: set the ship in a loop
             Board[y, x] = ship;
+            return true;
         }
 
-        public void HandleFire(int x, int y)
+        /// <summary>
+        /// Handles incoming fire from the enemy
+        /// </summary>
+        /// <param name="x">X coordinate of the shot</param>
+        /// <param name="y">Y coordinate of the shot</param>
+        /// <returns>
+        /// false if the ship was not hit
+        /// true otherwise
+        /// </returns>
+        public bool HandleIncomingFire(int x, int y)
         {
-            if (!IsPositionInBounds(x, y)) return;
+            if (!IsPositionInBounds(x, y)) return false;
 
             var ship = Board[y, x];
-            if (Ship.IsHit(ship)) return;
+            if (Ship.IsHit(ship)) return false;
 
-            Board[y, x] = Ship.MarkAsHit(ship); //TODO: return status codes / throw exception if preconditions fail
+            Board[y, x] = Ship.MarkAsHit(ship);
+            return true;
         }
 
         public bool HasEnabledShips()
