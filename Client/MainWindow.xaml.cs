@@ -21,7 +21,7 @@ namespace Client
         private Button[,] EnemyButtons = new Button[10, 10];
 
         private HubConnection Connection;
-        private int Seat;
+        private int Seat, Turn;
 
         public MainWindow()
         {
@@ -76,7 +76,6 @@ namespace Client
         private Button CreateButton(bool myBoard, int x, int y)
         {
             Button b = new Button();
-            b.Name = (myBoard ? "M_" : "E_") + y + "_" + x;
             b.Tag = new int[2] { x, y };
             b.Click += myBoard ? HandleShipArrangement : HandleShot;
             b.IsEnabled = false;
@@ -95,9 +94,10 @@ namespace Client
             Connection = new HubConnectionBuilder()
                 .WithUrl(@"http://localhost:4000/hubs/battleship")
                 .Build();
-    
+
             Connection.On<bool>("JoinResult", OnJoinResult);
             Connection.On<string, string>("ChatMessage", OnChatMessage);
+            Connection.On<string>("GameState", OnGameStateChanged);
 
             Connection.StartAsync();
             Connection.SendAsync("Join", NicknameTextbox.Text, Seat);
@@ -124,7 +124,7 @@ namespace Client
 
         }
 
-        private void SurrenderButton_Click(object sender, RoutedEventArgs e)
+        private void HandleAction(object sender, RoutedEventArgs e)
         {
 
         }
@@ -156,6 +156,40 @@ namespace Client
                 MessageTextbox.IsEnabled = false;
                 MessagesListbox.Items.Add("Nie udało się zająć miejsca");
                 Connection.DisposeAsync();
+            }
+        }
+
+        private void OnGameStateChanged(string newState)
+        {
+            if (newState == "NotStarted")
+            {
+                // Disable the UI completely except chat
+            }
+            else if (newState == "ArrangingShips")
+            {
+                foreach (Button b in MyButtons)
+                {
+                    b.IsEnabled = true;
+                }
+                // Allow arranging ships
+            }
+            else if (newState == "Started")
+            {
+                Turn = 0;
+
+                foreach (Button b in MyButtons)
+                {
+                    b.IsEnabled = false;
+                }
+
+                if (Turn == Seat)
+                {
+                    foreach (Button b in EnemyButtons)
+                    {
+                        b.IsEnabled = true;
+                    }
+                }
+                // Let players shoot based on current turn
             }
         }
 

@@ -134,7 +134,7 @@
             <Label Content="9" HorizontalAlignment="Center" Grid.Row="9" VerticalAlignment="Center"/>
             <Label Content="10" HorizontalAlignment="Center" Grid.Row="10" VerticalAlignment="Center"/>
         </Grid>
-        <Button x:Name="SurrenderButton" Content="Ready" Grid.Column="2" HorizontalAlignment="Center" Margin="0,0,0,10" VerticalAlignment="Bottom" Width="206" Click="SurrenderButton_Click" IsEnabled="False"/>
+        <Button x:Name="ActionButton" Content="Ready" Grid.Column="2" HorizontalAlignment="Center" Margin="0,0,0,10" VerticalAlignment="Bottom" Width="206" Click="HandleAction" IsEnabled="False"/>
         <ComboBox x:Name="SeatCombobox" Grid.Column="2" HorizontalAlignment="Right" Margin="0,10,40,0" VerticalAlignment="Top" Width="72"/>
         <Button x:Name="JoinButton" Content="Join" Grid.Column="2" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Height="22"/>
 
