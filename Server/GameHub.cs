@@ -54,19 +54,16 @@ namespace Server
             }
         }
 
-        public async Task Fire(int player, int x, int y)
+        public async Task Fire(int attacker, int x, int y)
         {
-            var result = CurrentGame.Fire(player, x, y);
+            var result = CurrentGame.Fire(attacker, x, y);
 
-            if (CurrentGame.CheckWin(player) == 1)
+            await Clients.All.SendAsync("ShotFired", attacker, x, y, result);
+
+            if (CurrentGame.CheckWin(attacker) == 1)
             {
-                await Clients.All.SendAsync("GameWon", player);
+                await Clients.All.SendAsync("GameWon", attacker);
                 return;
-            }
-
-            if (result)
-            {
-                await Clients.All.SendAsync("Turn", 1 - player);
             }
         }
 

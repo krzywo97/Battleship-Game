@@ -43,10 +43,22 @@ namespace Server
             if (!Ship.IsValid(ship)) return false;
 
             var size = Ship.GetSize(ship);
-            // if(!ValidatePlacement(byte ship, int x, int y, bool vertical)) return false;
+            if(!ValidatePlacement(x, y, size, vertical)) return false;
 
-            // TODO: set the ship in a loop
-            Board[y, x] = ship;
+            if (vertical)
+            {
+                for (int i = y; i < y + size; i++)
+                {
+                    Board[i, x] = ship;
+                }
+            }
+            else
+            {
+                for (int i = x; i < x + size; i++)
+                {
+                    Board[y, i] = ship;
+                }
+            }
             return true;
         }
 
@@ -64,6 +76,7 @@ namespace Server
             if (!IsPositionInBounds(x, y)) return false;
 
             var ship = Board[y, x];
+            if (ship == Ship.None) return false;
             if (Ship.IsHit(ship)) return false;
 
             Board[y, x] = Ship.MarkAsHit(ship);
@@ -72,9 +85,9 @@ namespace Server
 
         public bool HasEnabledShips()
         {
-            for(int i = 0; i < 10; i++)
+            for (int i = 0; i < 10; i++)
             {
-                for(int j = 0; j < 10; j++)
+                for (int j = 0; j < 10; j++)
                 {
                     var ship = Board[i, j];
                     if (Ship.IsShip(ship) && !Ship.IsHit(ship)) return true;
@@ -87,6 +100,12 @@ namespace Server
         private bool IsPositionInBounds(int x, int y)
         {
             return ((x >= 0) && (x <= 9) && (y >= 0) && (y <= 9));
+        }
+
+        private bool ValidatePlacement(int x, int y, int size, bool vertical)
+        {
+            // TODO: implement this method
+            return true
         }
     }
 }

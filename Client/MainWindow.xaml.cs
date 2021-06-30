@@ -60,7 +60,7 @@ namespace Client
             }
         }
 
-        private void ClearBoard()
+        private void ClearBoards()
         {
             for (int y = 0; y < 10; y++)
             {
@@ -108,7 +108,7 @@ namespace Client
             ClearBoardButton.IsEnabled = enable;
             foreach (Button b in MyButtons)
             {
-                var content = b.Content != null? b.Content.ToString() : "";
+                var content = b.Content != null ? b.Content.ToString() : "";
                 b.IsEnabled = enable && content.Length == 0;
             }
         }
@@ -117,7 +117,8 @@ namespace Client
         {
             foreach (Button b in EnemyButtons)
             {
-                b.IsEnabled = enable;
+                var content = b.Content != null ? b.Content.ToString() : "";
+                b.IsEnabled = enable && content.Length == 0;
             }
         }
 
@@ -144,6 +145,7 @@ namespace Client
             Connection.On<bool, int, int, int, bool>("ShipSet", OnSetShipResult);
             Connection.On<string>("GameState", OnGameStateChanged);
             Connection.On<int>("PlayerReady", OnPlayerReady);
+            Connection.On<int, int, int, bool>("ShotFired", OnShotFired);
 
             Connection.StartAsync();
             Connection.SendAsync("Join", NicknameTextbox.Text, Client.Seat);
@@ -174,12 +176,15 @@ namespace Client
             int x = tag[0];
             int y = tag[1];
 
+            Connection.SendAsync("Fire", Client.Seat, x, y);
+            EnableEnemyBoard(false);
         }
 
         private void HandleAction(object sender, RoutedEventArgs e)
         {
-            if(Client.State == GameState.ArrangingShips)
+            if (Client.State == GameState.ArrangingShips)
             {
+                EnableMyBoard(false);
                 Connection.SendAsync("ReadyUp", Client.Seat);
             }
 
@@ -198,7 +203,6 @@ namespace Client
         /*
          * Game event handlers
          */
-
         private void OnJoinResult(bool result)
         {
             if (result)
@@ -221,6 +225,7 @@ namespace Client
             if (newState == "NotStarted")
             {
                 Client.State = GameState.Stopped;
+                ClearBoards();
                 // Disable the UI completely except chat
             }
             else if (newState == "ArrangingShips")
@@ -260,14 +265,14 @@ namespace Client
                     {
                         for (int i = y; i < y + size; i++)
                         {
-                            MyButtons[i, x].Content = "X";
+                            MyButtons[i, x].Content = "#";
                         }
                     }
                     else
                     {
                         for (int i = x; i < x + size; i++)
                         {
-                            MyButtons[y, i].Content = "X";
+                            MyButtons[y, i].Content = "#";
                         }
                     }
                 }
@@ -280,6 +285,21 @@ namespace Client
         private void OnPlayerReady(int player)
         {
             MessagesListbox.Items.Add("Gracz " + (player + 1) + " gotowy");
+        }
+
+        private void OnShotFired(int attacker, int x, int y, bool hit)
+        {
+            if (attacker == Client.Seat)
+            {
+                EnemyButtons[y, x].Content = hit ? "X" : "O";
+            }
+            else
+            {
+                MyButtons[y, x].Content = hit ? "X" : "O";
+            }
+
+            Client.ChangeTurn();
+            EnableEnemyBoard(Client.Turn == Client.Seat);
         }
     }
 }

@@ -108,21 +108,21 @@ namespace Server
         /// <summary>
         /// Fires a shot at the opposing player's board
         /// </summary>
-        /// <param name="player">Attacker</param>
+        /// <param name="attacker">Attacker</param>
         /// <param name="x">X coordinate of the shot</param>
         /// <param name="y">Y coordinate of the shot</param>
         /// <returns>
         /// false if the parameters were incorrect
         /// true otherwise
         /// </returns>
-        public bool Fire(int player, int x, int y)
+        public bool Fire(int attacker, int x, int y)
         {
-            if (player != 0 && player != 1) return false;
+            if (attacker != 0 && attacker != 1) return false;
             if (State != GameState.Started) return false;
-            if (Turn != player) return false;
+            if (Turn != attacker) return false;
 
 
-            var result = Players[1 - player].HandleIncomingFire(x, y);
+            var result = Players[1 - attacker].HandleIncomingFire(x, y);
             Turn = 1 - Turn;
             return result;
         }
