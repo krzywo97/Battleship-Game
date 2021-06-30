@@ -232,7 +232,7 @@ namespace Client
             {
                 Client.State = GameState.ArrangingShips;
 
-                MessagesListbox.Items.Add("Obaj gracze gotowi. Pora rozstawić okręty");
+                MessagesListbox.Items.Add("Obaj gracze połączeni. Pora rozstawić okręty");
                 ActionButton.Content = "Gotowy";
                 ActionButton.IsEnabled = true;
 
@@ -241,7 +241,7 @@ namespace Client
             }
             else if (newState == "Started")
             {
-                Client.State = GameState.InProgress;
+                Client.State = GameState.Started;
 
                 MessagesListbox.Items.Add("Gra rozpoczęta. Kolej gracza 1");
 

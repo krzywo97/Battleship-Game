@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Server
+namespace Client
 {
     public enum GameState
     {
-        NotStarted,
+        Stopped,
         ArrangingShips,
         Started
     }
