@@ -105,7 +105,6 @@ namespace Client
 
         private void EnableMyBoard(bool enable)
         {
-            ClearBoardButton.IsEnabled = enable;
             foreach (Button b in MyButtons)
             {
                 var content = b.Content != null ? b.Content.ToString() : "";
