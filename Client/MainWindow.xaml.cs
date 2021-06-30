@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Xaml.Behaviors;
 
 namespace Client
 {
@@ -17,11 +18,15 @@ namespace Client
     /// </summary>
     public partial class MainWindow : Window
     {
+        private string[] ContextMenuItems = { "Krążownik poziomo\t1x1", "Okręt podwodny poziomo\t2x1",
+            "Niszczyciel poziomo\t3x1", "Pancernik poziomo\t4x1", "Krążownik pionowo\t1x1",
+            "Okręt podwodny pionowo\t1x2","Niszczyciel pionowo\t1x3", "Pancernik pionowo\t1x4" };
+
         private Button[,] MyButtons = new Button[10, 10];
         private Button[,] EnemyButtons = new Button[10, 10];
 
         private HubConnection Connection;
-        private int Seat, Turn;
+        private GameClient Client;
 
         public MainWindow()
         {
@@ -29,6 +34,9 @@ namespace Client
             InitializeUi();
         }
 
+        /**
+         * Private UI control methods
+         */
         private void InitializeUi()
         {
             for (int y = 0; y < 10; y++)
@@ -67,14 +75,50 @@ namespace Client
             }
         }
 
+
         private Button CreateButton(bool myBoard, int x, int y)
         {
             Button b = new Button();
-            b.Tag = new int[2] { x, y };
-            b.Click += myBoard ? HandleShipArrangement : HandleShot;
             b.IsEnabled = false;
+            if (myBoard)
+            {
+                b.ContextMenu = new ContextMenu();
+                for (int i = 0; i < ContextMenuItems.Length; i++)
+                {
+                    var tag = new int[] { x, y, (i % 4) + 1, i / 4 };
+                    var item = new MenuItem { Header = ContextMenuItems[i], Tag = tag };
+                    item.Click += HandleShipArrangement;
+                    b.ContextMenu.Items.Add(item);
+                }
+
+                BehaviorCollection behaviors = Interaction.GetBehaviors(b);
+                behaviors.Add(new DropDownMenuBehavior());
+            }
+            else
+            {
+                b.Tag = new int[2] { x, y };
+                b.Click += HandleShot;
+            }
 
             return b;
+        }
+
+        private void EnableMyBoard(bool enable)
+        {
+            ClearBoardButton.IsEnabled = enable;
+            foreach (Button b in MyButtons)
+            {
+                var content = b.Content != null? b.Content.ToString() : "";
+                b.IsEnabled = enable && content.Length == 0;
+            }
+        }
+
+        private void EnableEnemyBoard(bool enable)
+        {
+            foreach (Button b in EnemyButtons)
+            {
+                b.IsEnabled = enable;
+            }
         }
 
         /*
@@ -88,7 +132,8 @@ namespace Client
             SeatCombobox.IsEnabled = false;
             JoinButton.IsEnabled = false;
             MessageTextbox.IsEnabled = true;
-            Seat = SeatCombobox.SelectedIndex;
+
+            Client = new GameClient(SeatCombobox.SelectedIndex);
 
             Connection = new HubConnectionBuilder()
                 .WithUrl(@"http://localhost:4000/hubs/battleship")
@@ -96,25 +141,36 @@ namespace Client
 
             Connection.On<bool>("JoinResult", OnJoinResult);
             Connection.On<string, string>("ChatMessage", OnChatMessage);
+            Connection.On<bool, int, int, int, bool>("ShipSet", OnSetShipResult);
             Connection.On<string>("GameState", OnGameStateChanged);
+            Connection.On<int>("PlayerReady", OnPlayerReady);
 
             Connection.StartAsync();
-            Connection.SendAsync("Join", NicknameTextbox.Text, Seat);
+            Connection.SendAsync("Join", NicknameTextbox.Text, Client.Seat);
         }
 
         private void HandleShipArrangement(object sender, RoutedEventArgs e)
         {
-            var button = (Button)sender;
-            int[] tag = (int[])button.Tag;
+            var b = sender as MenuItem;
+            int[] tag = b.Tag as int[];
             int x = tag[0];
             int y = tag[1];
+            int size = tag[2];
+            bool vertical = tag[3] == 1;
 
+            Connection.SendAsync("SetShip", Client.Seat, size, x, y, vertical);
+            EnableMyBoard(false);
+        }
+
+        private void HandleClearBoard(object sender, RoutedEventArgs e)
+        {
+            // TODO: implement this method
         }
 
         private void HandleShot(object sender, RoutedEventArgs e)
         {
             var button = (Button)sender;
-            int[] tag = (int[])button.Tag;
+            int[] tag = button.Tag as int[];
             int x = tag[0];
             int y = tag[1];
 
@@ -122,7 +178,12 @@ namespace Client
 
         private void HandleAction(object sender, RoutedEventArgs e)
         {
+            if(Client.State == GameState.ArrangingShips)
+            {
+                Connection.SendAsync("ReadyUp", Client.Seat);
+            }
 
+            ActionButton.IsEnabled = false;
         }
 
         private void SendChatMessage(object sender, KeyEventArgs e)
@@ -130,7 +191,7 @@ namespace Client
             if (e.Key != Key.Enter) return;
             if (MessageTextbox.Text.Length == 0) return;
 
-            Connection.SendAsync("ChatMessage", Seat, MessageTextbox.Text);
+            Connection.SendAsync("ChatMessage", Client.Seat, MessageTextbox.Text);
             MessageTextbox.Text = "";
         }
 
@@ -142,7 +203,7 @@ namespace Client
         {
             if (result)
             {
-                MessagesListbox.Items.Add("Zajęto miejsce: " + (Seat + 1));
+                MessagesListbox.Items.Add("Zajęto miejsce: " + (Client.Seat + 1));
             }
             else
             {
@@ -159,41 +220,66 @@ namespace Client
         {
             if (newState == "NotStarted")
             {
+                Client.State = GameState.Stopped;
                 // Disable the UI completely except chat
             }
             else if (newState == "ArrangingShips")
             {
-                ActionButton.Content = "Gotowy";
+                Client.State = GameState.ArrangingShips;
 
-                foreach (Button b in MyButtons)
-                {
-                    b.IsEnabled = true;
-                }
-                // Allow arranging ships
+                MessagesListbox.Items.Add("Obaj gracze gotowi. Pora rozstawić okręty");
+                ActionButton.Content = "Gotowy";
+                ActionButton.IsEnabled = true;
+
+                EnableMyBoard(true);
+                EnableEnemyBoard(false);
             }
             else if (newState == "Started")
             {
-                Turn = 0;
+                Client.State = GameState.InProgress;
 
-                foreach (Button b in MyButtons)
-                {
-                    b.IsEnabled = false;
-                }
+                MessagesListbox.Items.Add("Gra rozpoczęta. Kolej gracza 1");
 
-                if (Turn == Seat)
-                {
-                    foreach (Button b in EnemyButtons)
-                    {
-                        b.IsEnabled = true;
-                    }
-                }
-                // Let players shoot based on current turn
+                EnableMyBoard(false);
+                EnableEnemyBoard(Client.Turn == Client.Seat);
             }
         }
 
         private void OnChatMessage(string nickname, string message)
         {
             MessagesListbox.Items.Add(nickname + ": " + message);
+        }
+
+        private void OnSetShipResult(bool result, int x, int y, int size, bool vertical)
+        {
+            try
+            {
+                if (result)
+                {
+                    if (vertical)
+                    {
+                        for (int i = y; i < y + size; i++)
+                        {
+                            MyButtons[i, x].Content = "X";
+                        }
+                    }
+                    else
+                    {
+                        for (int i = x; i < x + size; i++)
+                        {
+                            MyButtons[y, i].Content = "X";
+                        }
+                    }
+                }
+            }
+            catch (IndexOutOfRangeException) { }
+
+            EnableMyBoard(true);
+        }
+
+        private void OnPlayerReady(int player)
+        {
+            MessagesListbox.Items.Add("Gracz " + (player + 1) + " gotowy");
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Server
         }
 
         /// <summary>
-        /// Adds a player to the game.
+        /// Adds player to the game.
         /// </summary>
         /// <param name="name">A nickname of the player</param>
         /// <param name="seat">A seat the player will sit on</param>
@@ -69,7 +69,7 @@ namespace Server
         }
 
         /// <summary>
-        /// Marks the player as ready to start the game
+        /// Marks player as ready to start the game
         /// </summary>
         /// <param name="player">Player to be marked</param>
         /// <returns>
@@ -85,20 +85,22 @@ namespace Server
         }
 
         /// <summary>
-        /// Sets the ship on a board
+        /// Sets a ship on the board
         /// </summary>
         /// <param name="player">Player that requested to set the ship</param>
-        /// <param name="ship">Type of a ship</param>
+        /// <param name="size">Size of a ship</param>
         /// <param name="x">X coordinate </param>
         /// <param name="y"></param>
         /// <returns>
         /// false if parameters were incorrect
         /// true otherwise
         /// </returns>
-        public bool SetShip(int player, byte ship, int x, int y, bool vertical)
+        public bool SetShip(int player, int size, int x, int y, bool vertical)
         {
             if (player != 0 && player != 1) return false;
             if (State != GameState.ArrangingShips) return false;
+            var ship = Ship.GetShipBySize(size);
+            if (ship == Ship.None) return false;
 
             return Players[player].SetShip(ship, x, y, vertical);
         }

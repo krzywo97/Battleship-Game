@@ -24,6 +24,15 @@ namespace Server
             return 0;
         }
 
+        public static byte GetShipBySize(int size)
+        {
+            if (size == 1) return Destroyer;
+            if (size == 2) return Submarine;
+            if (size == 3) return Cruiser;
+            if (size == 4) return Battleship;
+            return None;
+        }
+
         public static bool IsShip(byte ship)
         {
             ship = UnmarkAsHit(ship);

@@ -16,7 +16,7 @@ namespace Client
         public Action<int> OnPlayerJoined { get; set; }
         public Action<int> OnPlayerLeft { get; set; }
         public Action<int> OnPlayerReady { get; set; }
-        public Action<int, Ship, bool, int, int> OnShipArranged { get; set; }
+        //public Action<int, Ship, bool, int, int> OnShipArranged { get; set; }
         public Action OnGameStarted { get; set; }
         public Action OnGameFinished { get; set; }
         public Action<int, int, int> OnShotFired { get; set; }
@@ -35,7 +35,7 @@ namespace Client
 
         public Game(string hubUrl, int player, string nickname)
         {
-            PlayerId = player;
+            /*PlayerId = player;
             Nickname = nickname;
 
             Connection = new HubConnectionBuilder()
@@ -49,7 +49,7 @@ namespace Client
             Connection.On("GameStarted", HandleGameStarted);
             Connection.On("GameFinished", HandleGameFinished);
             Connection.On<int, int, int>("ShotFired", HandleShotFired);
-            Connection.On<string, string>("ChatMessage", HandleChatMessage);
+            Connection.On<string, string>("ChatMessage", HandleChatMessage);*/
         }
 
         private void Initialize()
@@ -82,10 +82,10 @@ namespace Client
             OnPlayerReady(player);
         }
 
-        private void HandleShipArranged(int player, Ship ship, bool vertical, int x, int y)
+        /*private void HandleShipArranged(int player, Ship ship, bool vertical, int x, int y)
         {
             OnShipArranged(player, ship, vertical, x, y);
-        }
+        }*/
 
         private void HandleGameStarted()
         {
@@ -130,7 +130,7 @@ namespace Client
             Connection.SendAsync("PlayerReady", PlayerId);
         }
 
-        public void ArrangeShip(Ship ship, bool vertical, int x, int y)
+        /*public void ArrangeShip(Ship ship, bool vertical, int x, int y)
         {
             if (CurrentState != GameState.ArrangingShips) return;
             if (!ValidateArrangement(ship, vertical, x, y)) return;
@@ -152,7 +152,7 @@ namespace Client
             }
 
             Connection.SendAsync("ShipArranged", PlayerId, (int)ship, vertical, x, y);
-        }
+        }*/
 
         public void FireShot(int x, int y)
         {
@@ -164,16 +164,8 @@ namespace Client
         /*
          * Other stuff
          */
-        private int GetShipLength(Ship ship)
-        {
-            if (ship == Ship.Destroyer) return 1;
-            if (ship == Ship.Submarine) return 2;
-            if (ship == Ship.Cruiser) return 3;
-            if (ship == Ship.Battleship) return 4;
-            return 0;
-        }
 
-        private bool ValidateArrangement(Ship ship, bool vertical, int x, int y)
+        /*private bool ValidateArrangement(Ship ship, bool vertical, int x, int y)
         {
             if (ship != Ship.Destroyer || ship != Ship.Submarine || ship != Ship.Cruiser || ship != Ship.Battleship) return false;
             if (x < 0 || x > 9 || y < 0 || y > 9) return false;
@@ -199,7 +191,7 @@ namespace Client
             }
 
             return true;
-        }
+        }*/
     }
 
     enum GameState
@@ -207,16 +199,6 @@ namespace Client
         Stopped,
         ArrangingShips,
         InProgress
-    }
-
-    enum Ship
-    {
-        None = 0,
-        Destroyer = 1,
-        Submarine = 2,
-        Cruiser = 4,
-        Battleship = 8,
-        Hit = 16
     }
 
     enum PlayerState

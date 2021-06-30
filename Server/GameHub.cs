@@ -16,7 +16,7 @@ namespace Server
             var result = CurrentGame.JoinPlayer(nickname, seat);
             await Clients.Caller.SendAsync("JoinResult", result);
 
-            if(CurrentGame.AreBothPlayersConnected())
+            if (CurrentGame.AreBothPlayersConnected())
             {
                 CurrentGame.State = GameState.ArrangingShips;
                 await Clients.All.SendAsync("GameState", "ArrangingShips");
@@ -25,26 +25,29 @@ namespace Server
 
         public async Task Disconnect(int player)
         {
-            if(CurrentGame.DisconnectPlayer(player))
+            if (CurrentGame.DisconnectPlayer(player))
             {
                 await Clients.All.SendAsync("GameState", "NotStarted");
             }
         }
 
-        public async Task SetShip(int player, byte ship, int x, int y, bool vertical)
+        public async Task SetShip(int player, int size, int x, int y, bool vertical)
         {
-            var result = CurrentGame.SetShip(player, ship, x, y, vertical);
-            
-            await Clients.Caller.SendAsync("ShipSet", result);
+            var result = CurrentGame.SetShip(player, size, x, y, vertical);
+
+            await Clients.Caller.SendAsync("ShipSet", result, x, y, size, vertical);
         }
 
         public async Task ReadyUp(int player)
         {
             var result = CurrentGame.ReadyUp(player);
 
-            await Clients.Caller.SendAsync("ReadyUp", result);
+            if (result)
+            {
+                await Clients.All.SendAsync("PlayerReady", player);
+            }
 
-            if(CurrentGame.AreBothPlayersReady())
+            if (CurrentGame.AreBothPlayersReady())
             {
                 CurrentGame.Start();
                 await Clients.All.SendAsync("GameState", "Started");
@@ -54,14 +57,14 @@ namespace Server
         public async Task Fire(int player, int x, int y)
         {
             var result = CurrentGame.Fire(player, x, y);
-            
-            if(CurrentGame.CheckWin(player) == 1)
+
+            if (CurrentGame.CheckWin(player) == 1)
             {
                 await Clients.All.SendAsync("GameWon", player);
                 return;
             }
 
-            if(result)
+            if (result)
             {
                 await Clients.All.SendAsync("Turn", 1 - player);
             }
@@ -73,7 +76,7 @@ namespace Server
 
             var player = CurrentGame.Players[seat];
             if (player == null) return;
-           
+
             await Clients.All.SendAsync("ChatMessage", player.Name, message);
         }
     }
