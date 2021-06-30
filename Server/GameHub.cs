@@ -44,7 +44,7 @@ namespace Server
 
             if (result)
             {
-                await Clients.All.SendAsync("PlayerReady", player);
+                await Clients.All.SendAsync("PlayerReady", CurrentGame.Players[player].Name);
             }
 
             if (CurrentGame.AreBothPlayersReady())

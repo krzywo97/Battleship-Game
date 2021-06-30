@@ -59,7 +59,6 @@
             <Label Content="8" HorizontalAlignment="Center" Grid.Row="8" VerticalAlignment="Center"/>
             <Label Content="9" HorizontalAlignment="Center" Grid.Row="9" VerticalAlignment="Center"/>
             <Label Content="10" HorizontalAlignment="Center" Grid.Row="10" VerticalAlignment="Center"/>
-            <Button x:Name="ClearBoardButton" Content="X" HorizontalAlignment="Stretch" Margin="5,10,5,10" VerticalAlignment="Stretch" Foreground="Red" FontWeight="Bold" Click="HandleClearBoard"/>
         </Grid>
         <TextBox x:Name="NicknameTextbox" Grid.Column="2" HorizontalAlignment="Left" Margin="8,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="103" Height="22" Text="Gracz"/>
         <TextBox x:Name="MessageTextbox" Grid.Column="2" HorizontalAlignment="Center" Margin="0,0,0,33" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="231" IsEnabled="False" KeyDown="SendChatMessage">

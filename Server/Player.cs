@@ -10,6 +10,7 @@ namespace Server
         public string Name { get; }
         public bool Ready { get; private set; }
         public byte[,] Board { get; private set; }
+        public int[] ArrangedShipsCount { get; private set; }
 
         public Player(string name)
         {
@@ -21,6 +22,7 @@ namespace Server
         {
             Ready = false;
             Board = new byte[10, 10];
+            ArrangedShipsCount = new int[4];
         }
 
         /// <summary>
@@ -32,9 +34,13 @@ namespace Server
         /// </returns>
         public bool ReadyUp()
         {
-            // TODO: Validate player's board
-            Ready = true;
-            return true;
+            // TODO: refactor this method so it looks clearer
+            Ready = (ArrangedShipsCount[0] == 4)
+                && (ArrangedShipsCount[1] == 3)
+                && (ArrangedShipsCount[2] == 2)
+                && (ArrangedShipsCount[3] == 1);
+
+            return Ready;
         }
 
         public bool SetShip(byte ship, int x, int y, bool vertical)
@@ -43,7 +49,8 @@ namespace Server
             if (!Ship.IsValid(ship)) return false;
 
             var size = Ship.GetSize(ship);
-            if(!ValidatePlacement(x, y, size, vertical)) return false;
+            if (!ValidatePlacement(x, y, size, vertical)) return false;
+            if (ArrangedShipsCount[size - 1] == 5 - size) return false;
 
             if (vertical)
             {
@@ -59,6 +66,8 @@ namespace Server
                     Board[y, i] = ship;
                 }
             }
+
+            ArrangedShipsCount[size - 1]++;
             return true;
         }
 
@@ -104,7 +113,26 @@ namespace Server
 
         private bool ValidatePlacement(int x, int y, int size, bool vertical)
         {
-            // TODO: implement this method
+            if (x < 0 || x > 9 || y < 0 || y > 9) return false;
+
+            //Does the ship fit inside the bounds?
+            if ((vertical && y + size - 1 > 9) || (!vertical && x + size - 1 > 9)) return false;
+
+            var x1 = x - 1;
+            var x2 = vertical ? x + 1 : x + size;
+            var y1 = y - 1;
+            var y2 = vertical ? y + size : y + 1;
+
+            //Is there enough free space around the ship?
+            for (int i = y1; i <= y2; i++)
+            {
+                if (i < 0 || i > 9) continue;
+                for (int j = x1; j <= x2; j++)
+                {
+                    if (j < 0 || j > 9) continue;
+                    if (Board[i, j] != (int)Ship.None) return false;
+                }
+            }
 
             return true;
         }

@@ -144,7 +144,7 @@ namespace Client
             Connection.On<string, string>("ChatMessage", OnChatMessage);
             Connection.On<bool, int, int, int, bool>("ShipSet", OnSetShipResult);
             Connection.On<string>("GameState", OnGameStateChanged);
-            Connection.On<int>("PlayerReady", OnPlayerReady);
+            Connection.On<string>("PlayerReady", OnPlayerReady);
             Connection.On<int, int, int, bool>("ShotFired", OnShotFired);
             Connection.On<int>("GameWon", OnGameWon);
 
@@ -258,34 +258,30 @@ namespace Client
 
         private void OnSetShipResult(bool result, int x, int y, int size, bool vertical)
         {
-            try
+            if (result)
             {
-                if (result)
+                if (vertical)
                 {
-                    if (vertical)
+                    for (int i = y; i < y + size; i++)
                     {
-                        for (int i = y; i < y + size; i++)
-                        {
-                            MyButtons[i, x].Content = "#";
-                        }
+                        MyButtons[i, x].Content = "#";
                     }
-                    else
+                }
+                else
+                {
+                    for (int i = x; i < x + size; i++)
                     {
-                        for (int i = x; i < x + size; i++)
-                        {
-                            MyButtons[y, i].Content = "#";
-                        }
+                        MyButtons[y, i].Content = "#";
                     }
                 }
             }
-            catch (IndexOutOfRangeException) { }
 
             EnableMyBoard(true);
         }
 
-        private void OnPlayerReady(int player)
+        private void OnPlayerReady(string nickname)
         {
-            MessagesListbox.Items.Add("Gracz " + (player + 1) + " gotowy");
+            MessagesListbox.Items.Add("Gracz " +nickname + " gotowy");
         }
 
         private void OnShotFired(int attacker, int x, int y, bool hit)
@@ -299,7 +295,11 @@ namespace Client
                 MyButtons[y, x].Content = hit ? "X" : "O";
             }
 
-            Client.ChangeTurn();
+            if (!hit)
+            {
+                Client.ChangeTurn();
+            }
+
             EnableEnemyBoard(Client.Turn == Client.Seat);
         }
 

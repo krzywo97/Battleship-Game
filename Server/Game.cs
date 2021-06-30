@@ -123,7 +123,12 @@ namespace Server
 
 
             var result = Players[1 - attacker].HandleIncomingFire(x, y);
-            Turn = 1 - Turn;
+
+            if (!result)
+            {
+                Turn = 1 - Turn;
+            }
+
             return result;
         }
 
