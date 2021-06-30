@@ -37,9 +37,9 @@ namespace Server
         {
             ship = UnmarkAsHit(ship);
 
-            return ((ship != Ship.Destroyer)
-                || (ship != Ship.Submarine)
-                || (ship != Ship.Cruiser)
+            return ((ship == Ship.Destroyer)
+                || (ship == Ship.Submarine)
+                || (ship == Ship.Cruiser)
                 || (ship == Ship.Battleship));
         }
 

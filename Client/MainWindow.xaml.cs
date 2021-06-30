@@ -146,6 +146,7 @@ namespace Client
             Connection.On<string>("GameState", OnGameStateChanged);
             Connection.On<int>("PlayerReady", OnPlayerReady);
             Connection.On<int, int, int, bool>("ShotFired", OnShotFired);
+            Connection.On<int>("GameWon", OnGameWon);
 
             Connection.StartAsync();
             Connection.SendAsync("Join", NicknameTextbox.Text, Client.Seat);
@@ -300,6 +301,16 @@ namespace Client
 
             Client.ChangeTurn();
             EnableEnemyBoard(Client.Turn == Client.Seat);
+        }
+
+        private void OnGameWon(int player)
+        {
+            MessagesListbox.Items.Add("Wygrał gracz " + (player + 1));
+
+            EnableMyBoard(false);
+            EnableEnemyBoard(false);
+
+            Client.State = GameState.Stopped;
         }
     }
 }

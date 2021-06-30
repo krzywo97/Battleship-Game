@@ -105,7 +105,8 @@ namespace Server
         private bool ValidatePlacement(int x, int y, int size, bool vertical)
         {
             // TODO: implement this method
-            return true
+
+            return true;
         }
     }
 }
