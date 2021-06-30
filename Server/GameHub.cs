@@ -62,7 +62,7 @@ namespace Server
 
             if (CurrentGame.CheckWin(attacker) == 1)
             {
-                await Clients.All.SendAsync("GameWon", attacker);
+                await Clients.All.SendAsync("GameWon", CurrentGame.Players[attacker].Name);
                 return;
             }
         }
