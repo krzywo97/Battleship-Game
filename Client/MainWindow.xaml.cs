@@ -143,7 +143,7 @@ namespace Client
             Connection.On<string, string>("ChatMessage", OnChatMessage);
             Connection.On<bool, int, int, int, bool>("ShipSet", OnSetShipResult);
             Connection.On<string>("GameState", OnGameStateChanged);
-            Connection.On<string>("PlayerReady", OnPlayerReady);
+            Connection.On<int, bool, string>("PlayerReady", OnPlayerReady);
             Connection.On<int, int, int, bool>("ShotFired", OnShotFired);
             Connection.On<string>("GameWon", OnGameWon);
 
@@ -278,9 +278,20 @@ namespace Client
             EnableMyBoard(true);
         }
 
-        private void OnPlayerReady(string nickname)
+        private void OnPlayerReady(int seat, bool success, string nickname)
         {
-            MessagesListbox.Items.Add("Gracz " +nickname + " gotowy");
+            if(success)
+            {
+                MessagesListbox.Items.Add("Gracz " + nickname + " gotowy");
+            }
+            else
+            {
+                if(seat == Client.Seat)
+                {
+                    EnableMyBoard(true);
+                    ActionButton.IsEnabled = true;
+                }
+            }
         }
 
         private void OnShotFired(int attacker, int x, int y, bool hit)
@@ -308,6 +319,9 @@ namespace Client
 
             EnableMyBoard(false);
             EnableEnemyBoard(false);
+
+            ActionButton.Content = "Wstań";
+            ActionButton.IsEnabled = true;
 
             Client.State = GameState.Stopped;
         }
